@@ -3,3 +3,5 @@ credentials.json
 
 # Ignore token.pickle file
 token.pickle
+
+/backup/
