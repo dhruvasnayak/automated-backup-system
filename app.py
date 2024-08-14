@@ -15,6 +15,18 @@ def upload_files_to_drive(folder_id, local_folder_path):
         file_path = os.path.join(local_folder_path, filename)
         
         if os.path.isfile(file_path):
+            # Check if the file already exists in the folder
+            query = f"'{folder_id}' in parents and name = '{filename}' and trashed = false"
+            results = service.files().list(q=query, fields="files(id, name)").execute()
+            items = results.get('files', [])
+
+            # If the file exists, delete it
+            if items:
+                file_id = items[0]['id']
+                service.files().delete(fileId=file_id).execute()
+                print(f'Deleted existing file {filename} in folder ID {folder_id}')
+
+            # Upload the new file
             media = MediaFileUpload(file_path)
             file_metadata = {'name': filename, 'parents': [folder_id]}
             file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
@@ -24,12 +36,10 @@ def main():
     global creds
     creds = None
     
-    # Load credentials from the pickle file if it exists
     if os.path.exists('token.pickle'):
         with open('token.pickle', 'rb') as token:
             creds = pickle.load(token)
     
-    # Refresh credentials if they are expired or invalid
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
@@ -40,10 +50,8 @@ def main():
         with open('token.pickle', 'wb') as token:
             pickle.dump(creds, token)
     
-    # Define the folder ID of the Google Drive folder where files will be uploaded
     folder_id = '1Kwc-luqxaANckiq7KJsphnc5NOIPB6-q'
     
-    # Define the local folder path where files are located
     local_folder_path = 'C:\\Users\\dhruv\\OneDrive\\Desktop\\myn\\projects\\Automated_Backup\\backup'
     
     upload_files_to_drive(folder_id, local_folder_path)

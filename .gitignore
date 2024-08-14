@@ -1,7 +1,4 @@
-# Ignore credentials.json file
 credentials.json
-
-# Ignore token.pickle file
 token.pickle
-
+config.json
 /backup/
