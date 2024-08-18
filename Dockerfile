@@ -4,7 +4,7 @@ FROM python:3.9-slim
 # Set the working directory in the container
 WORKDIR /usr/src/app
 
-# Copy the entire root directory contents into the container at /usr/src/app
+# Copy everything except the backup directory to the container
 COPY . .
 
 # Install any necessary packages
